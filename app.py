@@ -14,6 +14,12 @@ logger.setLevel(logging.INFO)
 def lambda_handler(event, context):
     logger.info("Event: " + str(event))
     logger.info(event['source'])
+    try:
+        stage = event['detail']['stage']
+    except:
+        stage=""
+
+
     message = {
     "@type": "MessageCard",
     "@context": "http://schema.org/extensions",
@@ -24,7 +30,17 @@ def lambda_handler(event, context):
         {
             "activityTitle": event['detail']['pipeline'] + " has " + event['detail']['state'],
             "activitySubtitle": "On "+ event['time'],
-            "activityImage": "https://img.stackshare.io/service/3297/aws-codepipeline.png"
+            "activityImage": "https://img.stackshare.io/service/3297/aws-codepipeline.png",
+             "facts": [
+                {
+                    "name": "Stage",
+                    "value": stage
+                },
+                {
+                    "name": "State",
+                    "value": event['detail']['state']
+                }
+            ]
         }
     ]
 }
