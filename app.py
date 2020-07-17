@@ -13,34 +13,29 @@ logger.setLevel(logging.INFO)
 
 def lambda_handler(event, context):
     logger.info("Event: " + str(event))
-    logger.info(event['source'])
+    message = event['message']
     try:
-        stage = event['detail']['stage']
+        stage = " on stage - " + message['detail']['stage']
+        logger.info(stage)
     except:
         stage=""
-
+    if message['detail']['pipeline'] != "SC-019725351547-pp-wnmj5clcy4qgq-BackendPipeline-3E189YXAX76N":
+        return {
+            "statusCode":200,
+            "body": "No msg sent to MS Teams"
+        }
 
     message = {
     "@type": "MessageCard",
     "@context": "http://schema.org/extensions",
     "themeColor": "0076D7",
-    "summary": event['source'],
-    "title": event['detail-type'],
+    "summary": message['source'],
+    "title": message['detail-type'],
     "sections": [
         {
-            "activityTitle": event['detail']['pipeline'] + " has " + event['detail']['state'],
-            "activitySubtitle": "On "+ event['time'],
+            "activityTitle": message['detail']['pipeline'] + " has " + message['detail']['state'] +stage,
+            "activitySubtitle": "On "+ message['time'],
             "activityImage": "https://img.stackshare.io/service/3297/aws-codepipeline.png",
-             "facts": [
-                {
-                    "name": "Stage",
-                    "value": stage
-                },
-                {
-                    "name": "State",
-                    "value": event['detail']['state']
-                }
-            ]
         }
     ]
 }
